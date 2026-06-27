@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SparkCrafters - AI-Powered Smart Learning Platform</title>
+    <meta name="description" content="SparkCrafters - Master any subject with AI-powered flashcards, MCQs, battle arena, and smart progress tracking. Start learning smarter today!">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #111118;
+            --elevated: #1a1a26;
+            --border-subtle: rgba(255,255,255,0.06);
+            --border: rgba(255,255,255,0.1);
+            --purple: #7c5ce7;
+            --purple-light: #a78bfa;
+            --cyan: #00d2ff;
+            --cyan-light: #67e8f9;
+            --gold: #f59e0b;
+            --gold-light: #fbbf24;
+            --green: #10b981;
+            --red: #ef4444;
+            --text: #f0f0f5;
+            --text-secondary: rgba(240,240,245,0.6);
+            --text-muted: rgba(240,240,245,0.4);
+            --glow-purple: 0 0 40px rgba(124,92,231,0.3);
+            --glow-cyan: 0 0 40px rgba(0,210,255,0.25);
+            --radius-sm: 10px;
+            --radius: 16px;
+            --radius-lg: 24px;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(ellipse at 15% 0%, rgba(124,92,231,0.15), transparent 50%),
+                radial-gradient(ellipse at 85% 90%, rgba(0,210,255,0.08), transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.04), transparent 60%);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        ::-webkit-scrollbar { width:5px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:10px; }
+
+        /* Particles */
+        .particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+        .particle { position:absolute; font-size:0.9rem; opacity:0.07; animation:drift 15s infinite linear; color:var(--purple-light); }
+        @keyframes drift { 0%{transform:translate(0,100vh)rotate(0deg);opacity:0.03;} 25%{opacity:0.1;} 50%{opacity:0.05;} 75%{opacity:0.12;} 100%{transform:translate(100vw,-10vh)rotate(720deg);opacity:0.03;} }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10,10,15,0.82);
+            backdrop-filter: blur(35px);
+            -webkit-backdrop-filter: blur(35px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.7rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        .navbar.scrolled { padding: 0.5rem 2rem; background: rgba(10,10,15,0.95); }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+        }
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, rgba(124,92,231,0.3), rgba(0,210,255,0.25));
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .nav-logo-icon i { font-size: 1rem; background: linear-gradient(135deg, #a78bfa, #67e8f9); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .nav-logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #a78bfa, #67e8f9, #fbbf24);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+
+        .nav-links { display: flex; gap: 1.8rem; align-items: center; }
+        .nav-link {
+            color: var(--text-secondary); text-decoration: none;
+            font-size: 0.82rem; font-weight: 500;
+            transition: all 0.3s; cursor: pointer;
+        }
+        .nav-link:hover { color: var(--text); }
+
+        .btn {
+            padding: 0.55rem 1.2rem; border: none; border-radius: 20px;
+            font-weight: 600; cursor: pointer; transition: all 0.3s;
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            font-size: 0.78rem; font-family: 'Inter', sans-serif; text-decoration: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--purple), #8b7cf0);
+            color: #fff; box-shadow: 0 4px 18px rgba(124,92,231,0.35);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,92,231,0.5); }
+        .btn-accent {
+            background: linear-gradient(135deg, var(--cyan), #00e0ff);
+            color: #0a0a0f; font-weight: 700;
+        }
+        .btn-accent:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,210,255,0.45); }
+        .btn-outline {
+            background: transparent; border: 1.5px solid var(--border);
+            color: var(--text);
+        }
+        .btn-outline:hover { border-color: var(--cyan); color: var(--cyan-light); }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-content { text-align: center; max-width: 800px; }
+        .hero-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: rgba(124,92,231,0.12);
+            border: 1px solid rgba(124,92,231,0.25);
+            border-radius: 25px;
+            font-size: 0.78rem; color: var(--purple-light);
+            margin-bottom: 1.5rem; font-weight: 500;
+        }
+        .hero-badge i { color: var(--cyan-light); margin-right: 0.3rem; }
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3.8rem; font-weight: 900; line-height: 1.15;
+            margin-bottom: 1.2rem; letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #fff, #a78bfa, #67e8f9, #fbbf24);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+        .hero-subtitle {
+            font-size: 1.15rem; color: var(--text-secondary);
+            margin-bottom: 2.5rem; line-height: 1.6; max-width: 550px;
+            margin-left: auto; margin-right: auto;
+        }
+        .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+        }
+        .stat-item { text-align: center; }
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.2rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--purple-light), var(--cyan));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+        .stat-label { color: var(--text-muted); font-size: 0.75rem; margin-top: 0.2rem; }
+
+        /* Sections */
+        .section-container { padding: 5rem 2rem; position: relative; z-index: 1; }
+        .section-title {
+            text-align: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.2rem; font-weight: 800; margin-bottom: 0.8rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--text), var(--cyan-light));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+        .section-subtitle { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 3rem; }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .feature-card {
+            background: rgba(20,20,32,0.55);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            transition: all 0.4s;
+            position: relative;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+        .feature-card::before {
+            content: ''; position: absolute; inset: 0; border-radius: var(--radius); padding: 1px;
+            background: linear-gradient(135deg, rgba(124,92,231,0.3), rgba(0,210,255,0.2), transparent 60%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            pointer-events: none; opacity: 0; transition: opacity 0.4s;
+        }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-card:hover { transform: translateY(-4px); border-color: var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 35px rgba(124,92,231,0.15); }
+        .feature-icon {
+            font-size: 2.2rem; margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--purple-light), var(--cyan));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+        .feature-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; margin-bottom: 0.5rem; font-weight: 700; }
+        .feature-card p { color: var(--text-secondary); font-size: 0.8rem; line-height: 1.5; }
+
+        /* How It Works */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .step-card { text-align: center; padding: 1.5rem; }
+        .step-number {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--purple), var(--cyan));
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem; font-weight: 800; color: #fff;
+        }
+        .step-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; margin-bottom: 0.4rem; }
+        .step-card p { color: var(--text-secondary); font-size: 0.78rem; }
+
+        /* CTA */
+        .cta-section {
+            background: rgba(20,20,32,0.45);
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 5rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .cta-card {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(26,26,38,0.7);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2rem;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: relative;
+        }
+        .cta-card::before {
+            content: ''; position: absolute; inset: -1px; border-radius: var(--radius-lg); padding: 1px;
+            background: linear-gradient(135deg, rgba(124,92,231,0.5), rgba(0,210,255,0.4), rgba(245,158,11,0.3));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            pointer-events: none;
+        }
+        .cta-card h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.8rem; }
+        .cta-card p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.8rem; }
+
+        /* Footer */
+        .footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border-subtle);
+            position: relative;
+            z-index: 1;
+        }
+        .footer-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #a78bfa, #67e8f9);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+        .footer p { color: var(--text-muted); font-size: 0.75rem; }
+        .footer a { color: var(--cyan-light); text-decoration: none; }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.4rem; }
+            .hero-subtitle { font-size: 0.95rem; }
+            .navbar { padding: 0.6rem 1rem; }
+            .nav-links { gap: 1rem; }
+            .nav-link { font-size: 0.7rem; }
+            .btn { padding: 0.45rem 0.9rem; font-size: 0.7rem; }
+            .stats-bar { gap: 1.5rem; }
+            .stat-number { font-size: 1.6rem; }
+            .section-title { font-size: 1.6rem; }
+            .features-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .hero-title { font-size: 1.9rem; }
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .hero-buttons .btn { width: 100%; max-width: 280px; justify-content: center; }
+            .nav-links .nav-link { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-icon"><i class="fas fa-bolt"></i></div>
+            <span class="nav-logo-text">SparkCrafters</span>
+        </a>
+        <div class="nav-links">
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#how-it-works" class="nav-link">How It Works</a>
+            <a href="#cta" class="nav-link">Get Started</a>
+            <a href="app.html" class="btn btn-primary"><i class="fas fa-rocket"></i> Launch App</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge reveal"><i class="fas fa-sparkles"></i> AI-Powered Learning Platform</div>
+            <h1 class="hero-title reveal">Master Any Subject<br>With AI Magic</h1>
+            <p class="hero-subtitle reveal">Create intelligent flashcards, battle AI bots, track your progress, and accelerate your learning with cutting-edge AI technology. All in one place.</p>
+            <div class="hero-buttons reveal">
+                <a href="app.html" class="btn btn-accent" style="padding:0.7rem 1.8rem;font-size:0.9rem;"><i class="fas fa-bolt"></i> Start Learning Free</a>
+                <a href="#features" class="btn btn-outline"><i class="fas fa-arrow-down"></i> Explore Features</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+        <div class="stat-item reveal"><div class="stat-number">12+</div><div class="stat-label">Study Tools</div></div>
+        <div class="stat-item reveal"><div class="stat-number">AI</div><div class="stat-label">Powered</div></div>
+        <div class="stat-item reveal"><div class="stat-number">100%</div><div class="stat-label">Free Core Features</div></div>
+        <div class="stat-item reveal"><div class="stat-number">∞</div><div class="stat-label">Knowledge</div></div>
+    </div>
+
+    <!-- FEATURES -->
+    <section class="section-container" id="features">
+        <h2 class="section-title reveal">Everything You Need</h2>
+        <p class="section-subtitle reveal">Powerful tools to supercharge your learning journey</p>
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                <h3>AI Card Generator</h3>
+                <p>Instantly create smart flashcards on any topic with our powerful AI engine. Just describe what you want to learn.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon"><i class="fas fa-swords"></i></div>
+                <h3>Battle Arena</h3>
+                <p>Challenge AI bots in epic knowledge battles. Answer correctly to deal damage and climb the leaderboard!</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+                <h3>Leitner System</h3>
+                <p>Scientifically proven spaced repetition algorithm to maximize your memory retention automatically.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon"><i class="fas fa-comment-dots"></i></div>
+                <h3>AI Chat Tutor</h3>
+                <p>Get instant answers, explanations, and help from your personal AI study assistant available 24/7.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon"><i class="fas fa-pen-to-square"></i></div>
+                <h3>MCQ Generator</h3>
+                <p>Generate multiple-choice questions automatically. Create custom tests or let AI do the work for you.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon"><i class="fas fa-file-pdf"></i></div>
+                <h3>PDF Downloads</h3>
+                <p>Download your flashcards and MCQs as professional PDF documents. Perfect for offline study and sharing.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section-container" id="how-it-works" style="background:rgba(20,20,32,0.3);">
+        <h2 class="section-title reveal">How It Works</h2>
+        <p class="section-subtitle reveal">Get started in minutes, not hours</p>
+        <div class="steps-grid">
+            <div class="step-card reveal">
+                <div class="step-number">1</div>
+                <h3>Create Cards</h3>
+                <p>Add flashcards manually or let AI generate them instantly from any topic you describe.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-number">2</div>
+                <h3>Practice & Battle</h3>
+                <p>Review cards, take MCQ tests, or challenge AI bots in the battle arena to test your knowledge.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-number">3</div>
+                <h3>Track Progress</h3>
+                <p>Level up, earn coins, unlock rewards, and watch your knowledge grow with detailed analytics.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-number">4</div>
+                <h3>Download & Share</h3>
+                <p>Export your study materials as PDF. Perfect for revision, sharing with friends, or printing.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section" id="cta">
+        <div class="cta-card reveal">
+            <h2>Ready to Spark Your Learning?</h2>
+            <p>Join learners worldwide who are mastering subjects with AI-powered tools. Start your journey today - completely free!</p>
+            <a href="app.html" class="btn btn-accent" style="padding:0.7rem 2rem;font-size:0.9rem;"><i class="fas fa-rocket"></i> Launch App - It's Free</a>
+            <p style="margin-top:1rem;font-size:0.7rem;color:var(--text-muted);">No credit card required. All core features included.</p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-logo">SparkCrafters</div>
+        <p>&copy; 2026 SparkCrafters. Built with <i class="fas fa-heart" style="color:var(--red);"></i> for learners everywhere.</p>
+        <p style="margin-top:0.3rem;">
+            <a href="app.html">Launch App</a> &bull; 
+            <a href="#features">Features</a> &bull; 
+            <a href="app.html#contact">Contact Us</a>
+        </p>
+    </footer>
+
+    <script>
+        // Particles
+        (function(){
+            const c=document.getElementById('particles');
+            const icons=['fa-circle','fa-star','fa-bolt','fa-brain','fa-graduation-cap','fa-atom','fa-crown','fa-gem'];
+            for(let i=0;i<25;i++){
+                const p=document.createElement('i');
+                p.className='fas particle '+icons[Math.floor(Math.random()*icons.length)];
+                p.style.cssText='left:'+Math.random()*100+'%;animation-delay:'+Math.random()*15+'s;animation-duration:'+(Math.random()*12+12)+'s;font-size:'+(Math.random()*0.8+0.5)+'rem;';
+                c.appendChild(p);
+            }
+        })();
+
+        // Scroll Reveal
+        function revealOnScroll(){
+            document.querySelectorAll('.reveal').forEach(el=>{
+                const top=el.getBoundingClientRect().top;
+                if(top<window.innerHeight-80)el.classList.add('visible');
+            });
+        }
+        window.addEventListener('scroll',revealOnScroll);
+        window.addEventListener('load',revealOnScroll);
+
+        // Navbar scroll effect
+        window.addEventListener('scroll',()=>{
+            document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50);
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(a=>{
+            a.addEventListener('click',function(e){
+                e.preventDefault();
+                const target=document.querySelector(this.getAttribute('href'));
+                if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+            });
+        });
+    </script>
+</body>
+</html>
